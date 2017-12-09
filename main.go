@@ -1,10 +1,11 @@
 package main
 
-import "flag"
-import "log"
-import "os/exec"
+import (
+	"log"
+	"os/exec"
 
-import "github.com/fsnotify/fsnotify"
+	"github.com/fsnotify/fsnotify"
+)
 
 type Options struct {
 	Recursive bool
@@ -13,29 +14,8 @@ type Options struct {
 }
 
 func main() {
-	var target = flag.String("target", ".", "Specifiy a path to a file or directory to watch.")
-	var recursive = flag.Bool("recursive", false, "Watch all subdirectories, if target is a directory.")
-	var command = flag.String("command", "", "Command to execute as an event callback.")
-	flag.Parse()
-
-	cmd, err := exec.LookPath(*command)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	opts := Options{
-		Recursive: *recursive,
-		Command:   cmd,
-		Paths:     nil,
-	}
-
-	log.Println(opts)
-
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer watcher.Close()
+	var options Options = optionsFromFlags()
+	var watcher fsnotify.Watcher = newWatch(&options)
 
 	// TODO: Make recursive!
 	if *recursive {
