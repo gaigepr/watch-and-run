@@ -26,15 +26,15 @@ func main() {
 			case event := <-watcher.Events:
 				switch {
 				case event.Op&fsnotify.Write == fsnotify.Write:
-					log.Println("WRITE:", event.Name)
+					log.Println("WRITE:  ", event.Name)
 				case event.Op&fsnotify.Create == fsnotify.Create:
-					log.Println("CREAT:", event.Name)
+					log.Println("CREATE: ", event.Name)
 				case event.Op&fsnotify.Remove == fsnotify.Remove:
-					log.Println("REMOV:", event.Name)
+					log.Println("REMOVE: ", event.Name)
 				case event.Op&fsnotify.Rename == fsnotify.Rename:
-					log.Println("RENAM:", event.Name)
+					log.Println("RENAME: ", event.Name)
 				case event.Op&fsnotify.Chmod == fsnotify.Chmod:
-					log.Println("CHMOD:", event.Name)
+					log.Println("CHMOD:  ", event.Name)
 				}
 			case err := <-watcher.Errors:
 				log.Println("ERROR:", err)
@@ -42,9 +42,16 @@ func main() {
 		}
 	}()
 
-	err = watcher.Add(*target)
-	if err != nil {
-		log.Fatal(err)
+	// TODO: Make recursive!
+	if *recursive {
+
+	} else {
+		err = watcher.Add(*target)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
+
+	// TODO: Make signals get handled and that is how to kill the process
 	<-done
 }
